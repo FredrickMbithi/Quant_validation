@@ -1,0 +1,31 @@
+{
+  "pair": "GBPUSD",
+  "rows": 1389,
+  "start": "2025-10-20 23:00:00+00:00",
+  "end": "2026-01-12 14:00:00+00:00",
+  "warnings": [
+    "SUSPICIOUS GAPS: 2 gaps > 5 bars but < 24h. Possible missing data or DST issues.\nFirst 5: {Timestamp('2025-12-25 22:00:00+0000', tz='UTC'): Timedelta('0 days 14:00:00'), Timestamp('2026-01-01 18:00:00+0000', tz='UTC'): Timedelta('0 days 08:00:00')}",
+    "ZERO-RANGE CANDLES: 17 (1.22%) bars have high==low. Either illiquid periods or bad data.",
+    "ZERO VOLUME: 1389 (100.00%) bars have zero volume. Remember: this is TICK volume, not real volume.",
+    "TICK VOLUME WARNING: Volume column is tick count, NOT traded volume. Real FX volume is unknowable without prime broker data.",
+    "POSSIBLE DST ISSUE in November: Found 472 1-hour gaps. Verify data is truly UTC, not local time with DST shifts.",
+    "NO SPREAD DATA: Estimated median bar range: 11.2 pips. Actual spread is UNKNOWN. For GBPUSD, expect 0.5-3 pips normal, 5-20+ during news."
+  ],
+  "errors": [],
+  "statistics": {
+    "weekend_gaps": 12,
+    "suspicious_gaps": 2,
+    "micro_gaps": 0,
+    "zero_range_candles": "17",
+    "zero_range_pct": 1.2239020878329734,
+    "ohlc_violations": "0",
+    "extreme_moves": 0,
+    "duplicate_timestamps": "0",
+    "long_stale_periods": 0,
+    "zero_volume_bars": "1389",
+    "estimated_median_range_pips": 11.165142059326172,
+    "price_decimals": 16
+  },
+  "passed": true,
+  "warning_count": 6
+}

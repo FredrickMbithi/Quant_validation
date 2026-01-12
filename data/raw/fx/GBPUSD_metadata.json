@@ -1,0 +1,15 @@
+{
+  "pair": "GBPUSD",
+  "source": "Yahoo Finance (yfinance)",
+  "price_type": "MID",
+  "timezone": "UTC",
+  "interval": "1h",
+  "volume_type": "none",
+  "spread_available": false,
+  "rows": 1389,
+  "LIMITATIONS": [
+    "MID PRICES - need spread model",
+    "1-hour bars only",
+    "No real volume"
+  ]
+}

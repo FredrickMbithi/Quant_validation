@@ -1,0 +1,11 @@
+{
+  "source": "Yahoo Finance (yfinance)",
+  "pair": "GBPUSD",
+  "price_type": "mid",
+  "timezone": "UTC",
+  "volume_type": "none",
+  "spread_available": false,
+  "bar_interval": "1h",
+  "dst_handling": "utc_native",
+  "notes": "Generated via yfinance hourly (period=730d) on 2026-01-12"
+}

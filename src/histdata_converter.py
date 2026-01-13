@@ -143,7 +143,7 @@ class HistDataConverter:
         output_file: Optional[str] = None
     ) -> pd.DataFrame:
         """
-        Convert and merge multiple HistData files (e.g., multiple years).
+        Convert and merge multiple HistData CSV files (e.g., multiple months/years).
         
         Args:
             input_files: List of paths to HistData CSVs
@@ -151,37 +151,73 @@ class HistDataConverter:
             output_file: Output path
             
         Returns:
-            Merged DataFrame
+            Merged UTC minute DataFrame
         """
-        all_dfs = []
-        
+        converted = []
         for f in input_files:
-            df = self.convert_histdata_file(f, pair, output_file=None)
-            df = df.drop(columns=['timestamp'])  # Will re-add after merge
-            all_dfs.append(pd.read_csv(f, delimiter=';', header=None,
-                names=['datetime_est', 'open', 'high', 'low', 'close', 'volume']))
+            df = pd.read_csv(
+                f,
+                delimiter=';',
+                header=None,
+                names=['datetime_est', 'open', 'high', 'low', 'close', 'volume'],
+            )
+            df['datetime_est'] = pd.to_datetime(df['datetime_est'], format='%Y%m%d %H%M%S')
+            df['timestamp'] = df['datetime_est'] + pd.Timedelta(hours=self.EST_TO_UTC_HOURS)
+            df['timestamp'] = df['timestamp'].dt.tz_localize('UTC')
+            df = df.drop(columns=['datetime_est'])
+            df = df[['timestamp', 'open', 'high', 'low', 'close', 'volume']]
+            converted.append(df)
         
-        # Re-process all together
-        combined = pd.concat(all_dfs, ignore_index=True)
-        
-        # Parse and convert
-        combined['datetime_est'] = pd.to_datetime(
-            combined['datetime_est'], format='%Y%m%d %H%M%S'
-        )
-        combined['timestamp'] = combined['datetime_est'] + pd.Timedelta(hours=self.EST_TO_UTC_HOURS)
-        combined['timestamp'] = combined['timestamp'].dt.tz_localize('UTC')
-        combined = combined.drop(columns=['datetime_est'])
-        combined = combined[['timestamp', 'open', 'high', 'low', 'close', 'volume']]
+        combined = pd.concat(converted, ignore_index=True)
         combined = combined.sort_values('timestamp').drop_duplicates().reset_index(drop=True)
         
         if output_file is None:
-            output_file = self.output_dir / f"{pair}.csv"
+            output_file = self.output_dir / f"{pair}_minute_UTC.csv"
         
         combined.to_csv(output_file, index=False)
         print(f"Combined {len(input_files)} files -> {output_file}")
         print(f"Total rows: {len(combined):,}")
         
         return combined
+
+    def resample_to_hourly(self, df_minute: pd.DataFrame, pair: str, output_file: Optional[str] = None) -> pd.DataFrame:
+        """
+        Resample minute OHLC (UTC) to hourly OHLC without altering raw files.
+        
+        - Open: first open
+        - High: max high
+        - Low: min low
+        - Close: last close
+        - Volume: sum (tick count)
+        """
+        df = df_minute.copy()
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df = df.set_index('timestamp')
+        rule = '1H'
+        ohlc = {
+            'open': 'first',
+            'high': 'max',
+            'low': 'min',
+            'close': 'last',
+        }
+        agg = df.resample(rule).agg({**ohlc, 'volume': 'sum'}).dropna()
+        agg = agg.reset_index()
+        
+        if output_file is None:
+            # Save to processed/fx
+            output_dir = Path('data/processed/fx')
+            output_dir.mkdir(parents=True, exist_ok=True)
+            output_file = output_dir / f"{pair}_hourly.csv"
+        
+        agg.to_csv(output_file, index=False)
+        print(f"Saved hourly resample: {output_file}")
+        return agg
+
+    def build_hourly_from_csvs(self, csv_files: List[str], pair: str) -> str:
+        """Convert multiple HistData minute CSVs and save hourly dataset."""
+        minute_df = self.convert_multiple_files(csv_files, pair)
+        hourly_df = self.resample_to_hourly(minute_df, pair)
+        return str(Path('data/processed/fx') / f"{pair}_hourly.csv")
     
     def extract_zip(self, zip_path: str, extract_to: Optional[str] = None) -> List[str]:
         """
@@ -252,7 +288,8 @@ if __name__ == "__main__":
         download_instructions()
         print("\nUsage:")
         print("  python histdata_converter.py <zip_or_csv_file> <pair>")
-        print("  python histdata_converter.py data/downloads/HISTDATA_COM_ASCII_GBPUSD_M1_2024.zip GBPUSD")
+        print("  python histdata_converter.py data/raw/fx/downloads/HISTDATA_COM_ASCII_GBPUSD_M1_2024.zip GBPUSD")
+        print("  python histdata_converter.py hourly <pair> <csv1> <csv2> ...  # build hourly from CSVs")
         sys.exit(0)
     
     input_file = sys.argv[1]
@@ -260,7 +297,14 @@ if __name__ == "__main__":
     
     converter = HistDataConverter()
     
-    if input_file.endswith('.zip'):
+    if input_file == 'hourly':
+        # Build hourly from provided CSV files
+        csv_files = sys.argv[3:]
+        if not csv_files:
+            print("Provide minute CSV files from HistData to build hourly dataset.")
+            sys.exit(1)
+        converter.build_hourly_from_csvs(csv_files, pair)
+    elif input_file.endswith('.zip'):
         # Extract and convert
         csv_files = converter.extract_zip(input_file)
         if csv_files:

@@ -2,7 +2,7 @@
 
 A Python-based validation framework for systematically testing quantitative FX trading hypotheses with rigorous statistical analysis, backtesting, and cost modeling.
 
-## 🎯 Purpose
+## Purpose
 
 This framework provides a structured approach to validate FX trading strategies before live deployment, ensuring:
 
@@ -11,7 +11,7 @@ This framework provides a structured approach to validate FX trading strategies 
 - **Realistic Costs** — Spread, slippage, and commission modeling
 - **Reproducibility** — All tests and validations documented
 
-## 📊 Validation Workflow
+## Validation Workflow
 
 ```
 Hypothesis → Data Collection → Statistical Tests → Backtest → Cost Analysis → Pass/Fail Decision
@@ -76,7 +76,7 @@ Quant_validation/
 └── requirements.txt            # Python dependencies
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Installation
 
@@ -156,7 +156,7 @@ else:
     print("✗ Strategy FAILED:", verdict['reason'])
 ```
 
-## 📋 Validation Checklist
+## Validation Checklist
 
 Before strategy deployment, ensure:
 
@@ -170,7 +170,7 @@ Before strategy deployment, ensure:
 - [ ] **Cross-Pair** — Works on at least 2 currency pairs
 - [ ] **Regime Tests** — Stable across volatility regimes
 
-## 🧪 Testing
+## Testing
 
 Run unit tests to verify framework integrity:
 
@@ -190,7 +190,7 @@ python -m pytest tests/test_costs.py
 - **Look-Ahead Bias** — Ensures signals use only past data
 - **Cost Models** — Spread, slippage, commission calculations
 
-## 📊 Data Sources Supported
+## Data Sources Supported
 
 ### 1. Dukascopy (via `dukascopy_fetcher.py`)
 - Tick data and 1-minute bars
@@ -207,7 +207,7 @@ python -m pytest tests/test_costs.py
 - Supports any OHLC format
 - Auto-validates for gaps and duplicates
 
-## 🔬 Key Modules
+## Key Modules
 
 ### `fx_data_loader.py` (29KB - Production Ready)
 
@@ -301,7 +301,7 @@ PASS
 Proceed to walk-forward validation
 ```
 
-## 🛠️ Development
+## Development
 
 ### Adding New Tests
 
@@ -314,7 +314,7 @@ Proceed to walk-forward validation
 
 Implement custom loader inheriting from `data_loader.py` interface.
 
-## 📚 Related Projects
+## Related Projects
 
 - [fx-quant-research](https://github.com/FredrickMbithi/fx-quant-research) — Full production FX system
 - [ma-hp-filter](https://github.com/FredrickMbithi/ma-hp-filter) — MA + HP filter research
@@ -336,11 +336,11 @@ This is a **research framework**, not a trading system. Use it to:
 
 For production deployment, see [fx-quant-research](https://github.com/FredrickMbithi/fx-quant-research).
 
-## 📄 License
+## License
 
 MIT License
 
-## 👤 Author
+## Author
 
 Fredrick Mbithi
 
